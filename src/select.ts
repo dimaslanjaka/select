@@ -1,5 +1,9 @@
 var SelectCSS: boolean;
-class Select {
+/**
+ * Dimas Lanjaka Advanced Select
+ * @param target
+ */
+class dS {
 	target = null;
 	select = null;
 	display = null;
@@ -11,8 +15,14 @@ class Select {
 	settings = null;
 	highlighted = null;
 	filter = null;
-	constructor(target, settings) {
-		this.target = null;
+	constructor(target: string, settings: {
+		filtered: 'auto',
+		filter_threshold: 8,
+		filter_placeholder: 'Filter options...',
+		start: false,
+		save: false
+	}) {
+		this.target = target;
 		this.select = null;
 		this.display = null;
 		this.list = null;
@@ -20,10 +30,13 @@ class Select {
 		this.isLarge = false;
 		this.value = null;
 		this.selected = null;
-		this.settings = null;
+		this.settings = settings;
 		this.highlighted = null;
-		this.init();
+		if (settings.hasOwnProperty('start') && settings.start) this.init();
 	}
+	/**
+	 * Initialize Select
+	 */
 	init() {
 		switch (typeof this.target) {
 			case 'object':
@@ -45,7 +58,7 @@ class Select {
 		document.addEventListener('click', this.handleClickOff.bind(this));
 		this.positionList();
 	};
-	loadCss(url) {
+	loadCss(url: string) {
 		var link = document.createElement("link");
 		link.type = "text/css";
 		link.rel = "stylesheet";

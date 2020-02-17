@@ -1,5 +1,9 @@
 var SelectCSS;
-class Select {
+/**
+ * Dimas Lanjaka Advanced Select
+ * @param target
+ */
+class dS {
     constructor(target, settings) {
         this.target = null;
         this.select = null;
@@ -12,7 +16,7 @@ class Select {
         this.settings = null;
         this.highlighted = null;
         this.filter = null;
-        this.target = null;
+        this.target = target;
         this.select = null;
         this.display = null;
         this.list = null;
@@ -20,10 +24,14 @@ class Select {
         this.isLarge = false;
         this.value = null;
         this.selected = null;
-        this.settings = null;
+        this.settings = settings;
         this.highlighted = null;
-        this.init();
+        if (settings.hasOwnProperty('start') && settings.start)
+            this.init();
     }
+    /**
+     * Initialize Select
+     */
     init() {
         switch (typeof this.target) {
             case 'object':
