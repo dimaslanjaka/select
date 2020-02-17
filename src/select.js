@@ -1,7 +1,7 @@
 var SelectCSS;
 /**
  * Dimas Lanjaka Advanced Select
- * @param target
+ * @param target string
  */
 class dS {
     constructor(target, settings) {
