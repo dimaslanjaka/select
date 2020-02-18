@@ -2,3 +2,4 @@ node_modules
 .sass-cache
 demo.html
 src/r.txt
+src/test*

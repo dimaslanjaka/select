@@ -4,6 +4,9 @@ var SelectCSS: boolean;
  * @param target string
  */
 class dS {
+	/**
+	 * Target  of d s
+	 */
 	target = null;
 	select = null;
 	display = null;
@@ -48,7 +51,7 @@ class dS {
 		this.selected = null;
 		this.settings = settings;
 		this.highlighted = null;
-		if (settings.hasOwnProperty('start') && settings.start) this.init();
+		if (settings.hasOwnProperty('start') && settings.start) { this.init(); }
 	}
 	/**
 	 * Initialize Select
@@ -250,6 +253,7 @@ class dS {
 		if (!this.select.contains(e.target)) {
 			this.closeList();
 		}
+		console.log(typeof e, e)
 	}
 }
 

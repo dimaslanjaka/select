@@ -1,10 +1,60 @@
 var SelectCSS;
 /**
  * Dimas Lanjaka Advanced Select
- * @param target string
+ * @class Advanced Select
+ * @param {String} target
+ * @param {Object} settings
  */
 class dS {
-    constructor(target, settings) {
+    /**
+     * instance of HTML DOM
+     * @var {HTMLDocument} target
+     */
+    target = null;
+    select = null;
+    display = null;
+    list = null;
+    options = [];
+    isLarge = false;
+    value = null;
+    selected = null;
+    settings = null;
+    highlighted = null;
+    filter = null;
+    target = null;
+    select = null;
+    display = null;
+    list = null;
+    options = [];
+    isLarge = false;
+    value = null;
+    selected = null;
+    uid = null;
+    settings = null;
+    highlighted = null;
+    constructor(target, settings = {
+        /**
+         * Should the 'filter options' input be displayed?
+         */
+        filtered: 'auto',
+        /**
+         * Maximum displayed threshold
+         * * When a select contains `x` options or more, display the filter input.
+         */
+        filter_threshold: 8,
+        /**
+         * Placeholder text for the filter input.
+         */
+        filter_placeholder: 'Filter options...',
+        /**
+         * Auto start
+         */
+        start: false,
+        /**
+         * Save selected value to cache browser (saving for next request in same browser and pages)
+         */
+        save: false
+    }) {
         this.target = null;
         this.select = null;
         this.display = null;
@@ -24,10 +74,31 @@ class dS {
         this.isLarge = false;
         this.value = null;
         this.selected = null;
+        this.uid = null;
         this.settings = settings;
         this.highlighted = null;
-        if (settings.hasOwnProperty('start') && settings.start)
+        if (settings.hasOwnProperty('start') && settings.start) {
             this.init();
+        }
+    }
+    uuid() {
+        this.uid = location.host;
+        if (!this.target) {
+            this.uid = new Date().getTime();
+        } else {
+            if (this.target.getAttribute('name')) {
+                this.uid = this.target.getAttribute('name');
+            } else if (this.target.getAttribute('id')) {
+                this.uid = this.target.getAttribute('id');
+            }
+        }
+    }
+    /**
+     * Check element instanceOf Element Or HTMLDocument
+     * @param {any} element
+     */
+    isElement(element) {
+        return element instanceof Element || element instanceof HTMLDocument;
     }
     /**
      * Initialize Select
@@ -52,8 +123,13 @@ class dS {
         this.select.appendChild(this.target);
         document.addEventListener('click', this.handleClickOff.bind(this));
         this.positionList();
+        this.uuid();
+        this.load();
     }
-    ;
+    /**
+     * Load CSS Asynchronously
+     * @param {string} url
+     */
     loadCss(url) {
         var link = document.createElement("link");
         link.type = "text/css";
@@ -61,7 +137,9 @@ class dS {
         link.href = url;
         document.getElementsByTagName("head")[0].appendChild(link);
     }
-    ;
+    /**
+     * Build Select
+     */
     buildSelect() {
         this.select = document.createElement('div');
         this.select.classList.add('select');
@@ -83,7 +161,6 @@ class dS {
             this.select.classList.add('large');
         }
     }
-    ;
     buildList() {
         this.list = document.createElement('div');
         this.list.classList.add('list');
@@ -97,7 +174,6 @@ class dS {
         this.buildOptions();
         this.select.appendChild(this.list);
     }
-    ;
     buildOptions() {
         var ul = document.createElement('ul');
         var options = this.target.querySelectorAll('option');
@@ -111,7 +187,6 @@ class dS {
         }
         this.list.appendChild(ul);
     }
-    ;
     buildFilter() {
         var wrapper = document.createElement('div');
         wrapper.classList.add('filter');
@@ -122,27 +197,23 @@ class dS {
         wrapper.appendChild(this.filter);
         this.list.appendChild(wrapper);
     }
-    ;
     toggleList() {
         if (this.list.classList.contains('open')) {
             this.list.classList.remove('open');
             this.options[this.highlighted].classList.remove('hovered');
             this.select.focus();
-        }
-        else {
+        } else {
             this.options[this.target.selectedIndex].classList.add('hovered');
             this.highlighted = this.target.selectedIndex;
             this.list.classList.add('open');
             this.list.focus();
         }
     }
-    ;
     positionList() {
         if (!this.isLarge) {
             this.list.style.top = '-' + this.selected.offsetTop + 'px';
         }
     }
-    ;
     highlightOption(dir) {
         var next = null;
         switch (dir) {
@@ -159,19 +230,16 @@ class dS {
         this.options[next].classList.add('hovered');
         this.highlighted = next;
     }
-    ;
     clearFilter() {
         this.filter.value = '';
         for (var i = 0; i < this.options.length; i++) {
             this.options[i].style.display = 'block';
         }
     }
-    ;
     closeList() {
         this.list.classList.remove('open');
         this.options[this.highlighted].classList.remove('hovered');
     }
-    ;
     getSettings(settings) {
         var defaults = {
             filtered: 'auto',
@@ -183,21 +251,18 @@ class dS {
         }
         return defaults;
     }
-    ;
     // EVENT HANDLERS
     handleSelectKeydown(e) {
         if (this.select === document.activeElement && e.keyCode == 32) {
             this.toggleList();
         }
     }
-    ;
     handleDisplayClick(e) {
         this.list.classList.add('open');
         if (this.isLarge) {
             this.filter.focus();
         }
     }
-    ;
     handleListKeydown(e) {
         if (this.list === document.activeElement) {
             switch (e.keyCode) {
@@ -218,19 +283,54 @@ class dS {
             }
         }
     }
-    ;
     handleFilterKeyup(e) {
         var self = this;
         this.options.filter(function (li) {
             if (li.innerHTML.substring(0, self.filter.value.length).toLowerCase() == self.filter.value.toLowerCase()) {
                 li.style.display = 'block';
-            }
-            else {
+            } else {
                 li.style.display = 'none';
             }
         });
     }
-    ;
+    /**
+     * Save selected value
+     */
+    save() {
+        if (this.settings.hasOwnProperty('debug')) {
+            console.info({
+                'save': this.uid
+            });
+        }
+        localStorage.setItem(this.uid, this.value);
+    }
+    /**
+     * Load previous selected value
+     */
+    load(Value) {
+        if (this.uid && localStorage.getItem(this.uid) !== null && this.settings.hasOwnProperty('save') && this.settings.save) {
+            if (this.settings.hasOwnProperty('debug')) {
+                console.info({
+                    'load': {
+                        'key': this.uid,
+                        'text': this.target[this.target.selectedIndex].text,
+                        'val': localStorage.getItem(this.uid)
+                    }
+                });
+            }
+            this.target.value = localStorage.getItem(this.uid);
+            this.select.value = localStorage.getItem(this.uid);
+            this.value = localStorage.getItem(this.uid);
+            this.target.setAttribute('data-value', localStorage.getItem(this.uid));
+            this.selected = this.target;
+            this.display.innerHTML = this.target[this.target.selectedIndex].text;
+        }
+    }
+    reset() { }
+    /**
+     * Handle click on options
+     * @param {EventListenerOrEventListenerObject} e
+     */
     handleOptionClick(e) {
         this.display.innerHTML = e.target.innerHTML;
         this.target.value = e.target.getAttribute('data-value');
@@ -238,14 +338,15 @@ class dS {
         this.selected = e.target;
         this.closeList();
         this.clearFilter();
+        if (this.settings.hasOwnProperty('save') && this.settings.save && this.value) {
+            this.save();
+        }
         setTimeout(this.positionList.bind(this), 200);
     }
-    ;
     handleClickOff(e) {
         if (!this.select.contains(e.target)) {
             this.closeList();
         }
     }
-    ;
 }
 //# sourceMappingURL=select.js.map
