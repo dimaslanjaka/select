@@ -3,7 +3,9 @@
   "version": "0.9.7",
   "description": "Intuitive custom select element written in pure javascript.",
   "main": "src/select.js",
-  "scripts": {},
+  "scripts": {
+    "update": "npx npm-check-updates -u"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dimaslanjaka/select.git"
